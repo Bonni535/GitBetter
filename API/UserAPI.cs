@@ -1,6 +1,5 @@
 using GitBetter.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace GitBetter.API
 {
