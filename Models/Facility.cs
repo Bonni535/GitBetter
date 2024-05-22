@@ -8,7 +8,7 @@ namespace GitBetter.Models
         public string Address { get; set; }
         public string Description { get; set; }
 
-        public ICollection<User> Users { get; set; }
+        //public ICollection<User> Users { get; set; }
         public ICollection<Appointment> Appointments { get; set; }
         public ICollection<FacilitySpecialization> FacilitySpecializations { get; set; }
     }

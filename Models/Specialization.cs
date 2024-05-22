@@ -7,6 +7,6 @@ namespace GitBetter.Models
         public string Title { get; set; }
         public string Description { get; set; }
 
-        public ICollection<FacilitySpecialization> FacilitySpecializations { get; set; }
+        //public ICollection<FacilitySpecialization> FacilitySpecializations { get; set; }
     }
 }
