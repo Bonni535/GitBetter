@@ -12,7 +12,6 @@ namespace GitBetter.Models
         public string Notes { get; set; }
 
         public User Patient { get; set; }
-        public User Provider { get; set; }
         public Facility Facility { get; set;}
 
     }
