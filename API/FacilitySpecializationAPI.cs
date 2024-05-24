@@ -28,6 +28,33 @@ namespace GitBetter.API
 
                 return Results.Created($"/facilities/{facilityId}/specializations/{specializationId}", facilitySpecialization);
             });
+
+            //Delete a Specialization from a Facility
+            app.MapDelete("/facilities/{facilityId}/specializations/{facilitySpecializationId}", async (GitBetterDbContext db, int facilityId, int facilitySpecializationId) =>
+            {
+                var removeSpecialization = await db.FacilitySpecializations
+                .Include(fs => fs.Specialization)
+                .Where(fs => fs.SpecializationId == facilityId && fs.Id == facilitySpecializationId)
+                .FirstOrDefaultAsync();
+
+                if (removeSpecialization == null)
+                {
+                    return Results.NotFound("This Specialization was not found in this Facility.");
+                }
+
+                //Now Fetch the specific Facility
+                var facility = db.Facilities.Find(facilityId);
+                if(facility == null)
+                {
+                    return Results.NotFound("Facility not found.");
+                }
+
+                //Remove the FacilitySpecialization from the DataBase
+                db.FacilitySpecializations.Remove(removeSpecialization);
+                db.SaveChanges();
+
+                return Results.Ok(new { Message = $"{removeSpecialization.Specialization.Title} has been removed from the Facility {facilityId}." });
+            });
         }
     }
 }
