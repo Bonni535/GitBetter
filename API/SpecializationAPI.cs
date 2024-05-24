@@ -35,7 +35,7 @@ namespace GitBetter.API
             });
 
             //Delete a Specialization
-            app.MapDelete("/specializations", (GitBetterDbContext db, int id) =>
+            app.MapDelete("/specializations/{id}", (GitBetterDbContext db, int id) =>
             {
                 var specializationToDelete = db.Specializations.FirstOrDefault(s => s.Id == id);
 
@@ -50,7 +50,7 @@ namespace GitBetter.API
                     db.SaveChanges();
                 }
 
-                return Results.Ok();
+                return Results.Ok("The Specialization was deleted.");
             });
         
         }
