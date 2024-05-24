@@ -44,7 +44,7 @@ namespace GitBetter.API
             });
 
             //Delete a Facility
-            app.MapDelete("/facilities/{facilityId}", (GitBetterDbContext db, int facilityId, int specializationId) =>
+            app.MapDelete("/facilities/{facilityId}", (GitBetterDbContext db, int facilityId) =>
             {
                 var facility = db.Facilities.Include(f => f.Appointments).FirstOrDefault(f => f.Id == facilityId);
 

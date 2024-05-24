@@ -82,7 +82,7 @@ namespace GitBetter.API
             });
 
             //Delete an Appointment
-            app.MapDelete("/appointments", (GitBetterDbContext db, int id) =>
+            app.MapDelete("/appointments/{id}", (GitBetterDbContext db, int id) =>
             {
                 var appointmentToDelete = db.Appointments.FirstOrDefault(a => a.Id == id);
 
