@@ -44,7 +44,7 @@ namespace GitBetter.API
             });
 
             //Delete a Facility
-            app.MapDelete("/facilities/{facilityId}/specializations/{specializationId}", (GitBetterDbContext db, int facilityId, int specializationId) =>
+            app.MapDelete("/facilities/{facilityId}", (GitBetterDbContext db, int facilityId, int specializationId) =>
             {
                 var facility = db.Facilities.Include(f => f.Appointments).FirstOrDefault(f => f.Id == facilityId);
 
@@ -53,18 +53,18 @@ namespace GitBetter.API
                     return Results.NotFound("Facility not found.");
                 }
 
-                var specializationToRemove = facility.FacilitySpecializations.FirstOrDefault(s => s.Id == specializationId);
+               // var specializationToRemove = facility.FacilitySpecializations.FirstOrDefault(s => s.Id == specializationId);
 
-                if (specializationToRemove == null)
-                {
-                    return Results.NotFound("Specialization not found.");
-                }
+               // if (specializationToRemove == null)
+               // {
+               //     return Results.NotFound("Specialization not found.");
+               // }
 
-                facility.FacilitySpecializations.Remove(specializationToRemove);
+               // facility.FacilitySpecializations.Remove(specializationToRemove);
 
                 db.SaveChanges();
 
-                return Results.Ok("Specialization removed from the facility ");
+                return Results.Ok("The Facility was successfully deleted. ");
             });
 
           
