@@ -7,26 +7,45 @@ namespace GitBetter.API
     {
         public static void Map(WebApplication app)
         {
-            app.MapPost("/facilities/{facilityId}/specializations/{specializationId}", async (int facilityId, int specializationId, GitBetterDbContext context) =>
-            {
-                var facility = await context.Facilities.FindAsync(facilityId);
-                var specialization = await context.Specializations.FindAsync(specializationId);
+           
 
-                if (facility == null || specialization == null)
+            app.MapPost("/facilities/{facilityId}/specializations/{specializationId}", async (GitBetterDbContext db, int facilityId, int specializationId) =>
+            {
+                // Check if the Facility is in the Database
+                var facility = db.Facilities.FirstOrDefault(a => a.Id == facilityId);
+                if (facility == null)
                 {
-                    return Results.NotFound();
+                    return Results.NotFound("The Facility was not found.");
                 }
 
-                var facilitySpecialization = new FacilitySpecialization
+                // Check to see if the Specialization exists
+                var specialization = db.Specializations.FirstOrDefault(t => t.Id == specializationId);
+                if (specialization == null)
                 {
-                    FacilityId = facilityId,
-                    SpecializationId = specializationId
-                };
+                    return Results.NotFound("The Specialization was not found");
+                }
 
-                context.FacilitySpecializations.Add(facilitySpecialization);
-                await context.SaveChangesAsync();
+                // Check if the Specialization is already attached
+                var existingFacilitySpecialization = db.FacilitySpecializations.Where(fs => (fs.FacilityId == facilityId) && (fs.SpecializationId == specializationId)).FirstOrDefault();
+                if (existingFacilitySpecialization == null)
+                {
+                    var facilitySpecialization = new FacilitySpecialization
+                    {
+                        FacilityId = facilityId,
+                        SpecializationId = specializationId
+                    };
+                    db.FacilitySpecializations.Add(facilitySpecialization);
+                    db.SaveChanges();
 
-                return Results.Created($"/facilities/{facilityId}/specializations/{specializationId}", facilitySpecialization);
+                    var specializationTitle = specialization.Title;
+
+                    return Results.Ok($"{specializationTitle} has been added to the Facility {facilityId}.");
+                }
+                else
+                {
+                    return Results.NotFound("The Specialization was already added");
+                }
+
             });
 
             //Delete a Specialization from a Facility
@@ -34,7 +53,7 @@ namespace GitBetter.API
             {
                 var removeSpecialization = await db.FacilitySpecializations
                 .Include(fs => fs.Specialization)
-                .Where(fs => fs.SpecializationId == facilityId && fs.Id == facilitySpecializationId)
+                .Where(fs => fs.FacilityId == facilityId && fs.Id == facilitySpecializationId)
                 .FirstOrDefaultAsync();
 
                 if (removeSpecialization == null)
@@ -43,7 +62,7 @@ namespace GitBetter.API
                 }
 
                 //Now Fetch the specific Facility
-                var facility = db.Facilities.Find(facilityId);
+                var facility = db.Facilities.FindAsync(facilityId);
                 if(facility == null)
                 {
                     return Results.NotFound("Facility not found.");
@@ -51,7 +70,7 @@ namespace GitBetter.API
 
                 //Remove the FacilitySpecialization from the DataBase
                 db.FacilitySpecializations.Remove(removeSpecialization);
-                db.SaveChanges();
+                db.SaveChangesAsync();
 
                 return Results.Ok(new { Message = $"{removeSpecialization.Specialization.Title} has been removed from the Facility {facilityId}." });
             });
